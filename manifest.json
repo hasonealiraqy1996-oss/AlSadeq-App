@@ -1,6 +1,7 @@
 {
   "name": "Al-Sadeq General Trading",
   "short_name": "Al-Sadeq",
+  "description": "نظام إدارة شركة الصادق للتجارة العامة",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -11,7 +12,13 @@
       "src": "https://i.ibb.co/XF8g0Rk/Al-Sadeq-Logo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.ibb.co/XF8g0Rk/Al-Sadeq-Logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
