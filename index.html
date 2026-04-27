@@ -7,20 +7,21 @@
     
     <link rel="manifest" href="manifest.json">
     
+    <link rel="apple-touch-icon" href="logo.png">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="شركة الصادق">
 
     <style>
-        /* إلغاء جميع الحواف وأشرطة التمرير لجعل الشكل مثل التطبيقات الحقيقية */
         body, html { 
             margin: 0; 
             padding: 0; 
             height: 100%; 
             width: 100%; 
             overflow: hidden; 
-            background-color: #020406; /* لون متناسق مع تصميمك الفخم */
+            background-color: #020406;
         }
         
         iframe { 
@@ -30,6 +31,12 @@
             display: block;
         }
     </style>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+      }
+    </script>
 </head>
 <body>
 
