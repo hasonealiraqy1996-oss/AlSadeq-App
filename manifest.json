@@ -1,18 +1,21 @@
 {
-  "name": "شركة الصادق للإدارة",
-  "short_name": "الصادق",
-  "description": "نظام إدارة الحضور والإنصراف - شركة الصادق",
+  "name": "Al-Sadeq General Trading",
+  "short_name": "Al-Sadeq",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#020406",
-  "theme_color": "#00f2ff",
+  "background_color": "#ffffff",
+  "theme_color": "#014dae",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/5968/5968322.png",
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
