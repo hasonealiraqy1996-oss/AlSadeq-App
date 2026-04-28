@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>شركة الصادق | النظام الآمن</title>
-
+    
     <style>
         body, html { 
             margin: 0; padding: 0; height: 100%; width: 100%; 
@@ -47,7 +47,7 @@
         // دالة فتح اللوحة السرية بالرمز
         function openAdmin() {
             const pass = prompt("أدخل رمز المدير السري للوصول للإعدادات:");
-            if (pass === "787898") { // يمكنك تغيير الرمز هنا
+            if (pass === "1234") { // يمكنك تغيير الرمز هنا
                 document.getElementById('adminPanel').style.display = 'block';
             } else if (pass !== null) {
                 alert("الرمز غير صحيح!");
@@ -65,7 +65,7 @@
                 return;
             }
 
-            if (masterPass === "1122") {
+            if (masterPass === "1234") {
                 // إنشاء وسم فريد للجهاز
                 const token = "SADEQ-" + id + "-" + btoa(unescape(encodeURIComponent(name))).substring(0, 10);
                 
@@ -99,7 +99,7 @@
 
     <iframe 
         id="appFrame"
-        src="https://script.google.com/macros/s/AKfycbwr6yNLW3zY__MvcAT-F6CT-wb4qTRZOHS6knnaeLnfJMRFclacGd-3K0pqL2uD8lg6/exec" 
+        src="https://script.google.com/macros/s/AKfycbwGYiWzwa32EBtWx2IfQvfH7tYrRnEZ8lS4n1dHng3cm9cB_eU2RhOMQPU3mqwpNF0-/exec" 
         allow="geolocation; camera">
     </iframe>
 
@@ -120,5 +120,7 @@
             }
         };
     </script>
+</body>
+</html>
 </body>
 </html>
