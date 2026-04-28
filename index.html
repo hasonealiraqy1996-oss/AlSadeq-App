@@ -6,7 +6,6 @@
     <title>شركة الصادق</title>
     
     <link rel="manifest" href="manifest.json">
-    
     <link rel="apple-touch-icon" href="logo.png">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,34 +15,110 @@
 
     <style>
         body, html { 
-            margin: 0; 
-            padding: 0; 
-            height: 100%; 
-            width: 100%; 
-            overflow: hidden; 
-            background-color: #020406;
+            margin: 0; padding: 0; height: 100%; width: 100%; 
+            overflow: hidden; background-color: #020406;
         }
-        
-        iframe { 
-            border: none; 
-            width: 100%; 
-            height: 100%; 
-            display: block;
+        iframe { border: none; width: 100%; height: 100%; display: block; }
+
+        /* تصميم لوحة التحكم السرية */
+        #adminPanel {
+            display: none; position: fixed; top: 15%; left: 10%; right: 10%;
+            background: #1a1d21; border: 2px solid #014dae; color: white;
+            padding: 25px; border-radius: 15px; z-index: 9999; text-align: center;
+            box-shadow: 0 0 30px rgba(0,0,0,0.9);
+            font-family: sans-serif;
         }
+        input { 
+            width: 90%; padding: 12px; margin: 8px 0; border-radius: 8px; 
+            border: 1px solid #333; background: #000; color: #fff; text-align: center;
+        }
+        button { 
+            width: 95%; padding: 12px; margin: 10px 0; border-radius: 8px; 
+            border: none; background: #014dae; color: white; font-weight: bold; cursor: pointer; 
+        }
+        .close-btn { background: #444; margin-top: 5px; }
     </style>
 
     <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-      }
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        // فتح اللوحة السرية (5 نقرات سريعة)
+        let clickCount = 0;
+        function triggerAdmin() {
+            clickCount++;
+            if (clickCount === 5) {
+                document.getElementById('adminPanel').style.display = 'block';
+                clickCount = 0;
+            }
+            setTimeout(() => { clickCount = 0; }, 2000);
+        }
+
+        // حفظ بيانات الموظف والجهاز
+        function saveDevice() {
+            const empName = document.getElementById('empNameInput').value;
+            const empSerial = document.getElementById('empSerialInput').value;
+            const adminPass = document.getElementById('adminPass').value;
+
+            if (empName === "" || empSerial === "") {
+                alert("يرجى كتابة الاسم والرقم التسلسلي");
+                return;
+            }
+
+            if (adminPass === "787898") { // رمزك السري للدخول
+                // إنشاء وسم فريد يجمع الاسم بالتسلسل
+                const uniqueToken = "SADEQ-" + empSerial + "-" + btoa(empName).substring(0, 8);
+                
+                localStorage.setItem('sadeq_device_token', uniqueToken);
+                localStorage.setItem('employee_name', empName);
+                localStorage.setItem('employee_serial', empSerial);
+
+                alert("تم بنجاح ربط الجهاز بـ:\nالاسم: " + empName + "\nالتسلسل: " + empSerial);
+                document.getElementById('adminPanel').style.display = 'none';
+                location.reload(); 
+            } else {
+                alert("رمز المدير خطأ!");
+            }
+        }
     </script>
 </head>
-<body>
+<body onclick="triggerAdmin()">
+
+    <div id="adminPanel" onclick="event.stopPropagation()">
+        <h2 style="color: #014dae;">إدارة موظفي الصادق</h2>
+        <p>أدخل بيانات الموظف لتعريف هذا الهاتف:</p>
+        
+        <input type="text" id="empNameInput" placeholder="اسم الموظف الثلاثي">
+        <input type="text" id="empSerialInput" placeholder="الرقم التسلسلي (ID)">
+        <hr style="border: 0.5px solid #333; margin: 15px 0;">
+        <input type="password" id="adminPass" placeholder="رمز المدير السري">
+        
+        <button onclick="saveDevice()">تثبيت الهوية وربط الجهاز</button>
+        <button class="close-btn" onclick="document.getElementById('adminPanel').style.display='none'">إلغاء</button>
+    </div>
 
     <iframe 
+        id="appFrame"
         src="https://script.google.com/macros/s/AKfycbwGYiWzwa32EBtWx2IfQvfH7tYrRnEZ8lS4n1dHng3cm9cB_eU2RhOMQPU3mqwpNF0-/exec" 
         allow="geolocation; camera">
     </iframe>
 
+    <script>
+        window.onload = function() {
+            const token = localStorage.getItem('sadeq_device_token');
+            const name = localStorage.getItem('employee_name');
+            if (token) {
+                const frame = document.getElementById('appFrame');
+                // نرسل البيانات للسكربت ليعرف الموظف فوراً
+                frame.onload = function() {
+                    frame.contentWindow.postMessage({ 
+                        'device_token': token,
+                        'employee_name': name 
+                    }, "*");
+                };
+            }
+        };
+    </script>
 </body>
 </html>
