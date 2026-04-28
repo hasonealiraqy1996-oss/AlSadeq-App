@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>شركة الصادق | النظام الآمن</title>
+    
     <style>
         body, html { 
             margin: 0; padding: 0; height: 100%; width: 100%; 
@@ -46,7 +47,7 @@
         // دالة فتح اللوحة السرية بالرمز
         function openAdmin() {
             const pass = prompt("أدخل رمز المدير السري للوصول للإعدادات:");
-            if (pass === "1234") { // يمكنك تغيير الرمز هنا
+            if (pass === "1234") {
                 document.getElementById('adminPanel').style.display = 'block';
             } else if (pass !== null) {
                 alert("الرمز غير صحيح!");
@@ -65,7 +66,7 @@
             }
 
             if (masterPass === "1234") {
-                // إنشاء وسم فريد للجهاز
+                // إنشاء وسم فريد للجهاز (Token)
                 const token = "SADEQ-" + id + "-" + btoa(unescape(encodeURIComponent(name))).substring(0, 10);
                 
                 localStorage.setItem('sadeq_token', token);
@@ -73,7 +74,7 @@
                 
                 alert("تم بنجاح!\nالموظف: " + name + "\nالآن هذا الهاتف مرتبط بالنظام.");
                 document.getElementById('adminPanel').style.display = 'none';
-                location.reload(); // إعادة تحميل لإرسال البيانات للسكربت
+                location.reload(); 
             } else {
                 alert("رمز التأكيد خطأ");
             }
@@ -93,7 +94,7 @@
         <input type="password" id="masterPass" placeholder="رمز تأكيد المدير">
         
         <button class="btn-save" onclick="registerEmployee()">تثبيت الهوية الآن</button>
-        <button class="btn-cancel" onclick="document.getElementById('adminPanel').style.display='none'">إغاء</button>
+        <button class="btn-cancel" onclick="document.getElementById('adminPanel').style.display='none'">إلغاء</button>
     </div>
 
     <iframe 
@@ -103,14 +104,14 @@
     </iframe>
 
     <script>
-        // إرسال البيانات المخزنة للـ iframe عند التحميل
+        // إرسال البيانات المخزنة للـ iframe عند التحميل لضمان التعرف على الجهاز
         window.onload = function() {
             const token = localStorage.getItem('sadeq_token');
             const name = localStorage.getItem('sadeq_name');
             if (token) {
                 const frame = document.getElementById('appFrame');
                 frame.onload = function() {
-                    // نرسل الهوية المخزنة للسكربت ليتعرف على الموظف تلقائياً
+                    // نرسل الهوية للسكربت ليتعرف على الموظف تلقائياً ويختفي خطأ "جهاز غير معروف"
                     frame.contentWindow.postMessage({ 
                         'device_token': token,
                         'employee_name': name 
