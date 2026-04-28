@@ -3,111 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>شركة الصادق</title>
+    <title>شركة الصادق | النظام الآمن</title>
     
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="logo.png">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-
     <style>
         body, html { 
             margin: 0; padding: 0; height: 100%; width: 100%; 
-            overflow: hidden; background-color: #020406; font-family: sans-serif;
+            overflow: hidden; background-color: #020406; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         iframe { border: none; width: 100%; height: 100%; display: block; }
 
-        /* زر الإدارة المقفل */
-        .admin-trigger-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 45px;
-            height: 45px;
-            background: rgba(1, 77, 174, 0.3); /* لون خفيف جداً لكي لا يزعج الموظف */
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 50%;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
+        /* زر الإعدادات المخفي (الترس) */
+        .admin-gear {
+            position: fixed; bottom: 20px; left: 20px; width: 40px; height: 40px;
+            background: rgba(1, 77, 174, 0.2); border-radius: 50%; z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+            color: #555; cursor: pointer; transition: 0.3s;
         }
+        .admin-gear:hover { color: #014dae; background: rgba(1, 77, 174, 0.5); }
 
-        /* نافذة إدخال الرمز السري */
+        /* نافذة الإدارة السرية */
         #adminPanel {
-            display: none; position: fixed; top: 15%; left: 10%; right: 10%;
-            background: #1a1d21; border: 2px solid #014dae; color: white;
-            padding: 25px; border-radius: 15px; z-index: 9999; text-align: center;
-            box-shadow: 0 0 30px rgba(0,0,0,0.9);
+            display: none; position: fixed; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); width: 85%; max-width: 350px;
+            background: #111; border: 1px solid #014dae; color: white;
+            padding: 25px; border-radius: 20px; z-index: 9999; text-align: center;
+            box-shadow: 0 0 40px rgba(0,0,0,1);
         }
         
         input { 
-            width: 90%; padding: 12px; margin: 8px 0; border-radius: 8px; 
+            width: 90%; padding: 12px; margin: 10px 0; border-radius: 10px; 
             border: 1px solid #333; background: #000; color: #fff; text-align: center; font-size: 16px;
         }
         
-        .btn-action { 
-            width: 95%; padding: 12px; margin: 10px 0; border-radius: 8px; 
-            border: none; background: #014dae; color: white; font-weight: bold; cursor: pointer; 
+        .btn-save { 
+            width: 95%; padding: 12px; background: #014dae; color: white; 
+            border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px;
         }
         
-        .btn-close { background: #444; margin-top: 5px; width: 95%; padding: 10px; border-radius: 8px; border: none; color: white; }
+        .btn-cancel { background: none; color: #777; border: none; margin-top: 10px; cursor: pointer; }
     </style>
 
     <script>
-        // دالة لفتح اللوحة بعد التأكد من الرمز
-        function checkAdminAccess() {
-            const pass = prompt("أدخل رمز الدخول للإدارة:");
-            if (pass === "1234") { // هذا هو الرمز الذي يفتح اللوحة
+        // دالة فتح اللوحة السرية بالرمز
+        function openAdmin() {
+            const pass = prompt("أدخل رمز المدير السري للوصول للإعدادات:");
+            if (pass === "787898") { // يمكنك تغيير الرمز هنا
                 document.getElementById('adminPanel').style.display = 'block';
             } else if (pass !== null) {
                 alert("الرمز غير صحيح!");
             }
         }
 
-        // حفظ بيانات الموظف
-        function saveDevice() {
-            const empName = document.getElementById('empNameInput').value;
-            const empSerial = document.getElementById('empSerialInput').value;
-            const confirmPass = document.getElementById('finalPass').value;
+        // دالة حفظ الموظف وتثبيته على الهاتف
+        function registerEmployee() {
+            const name = document.getElementById('nameInp').value;
+            const id = document.getElementById('idInp').value;
+            const masterPass = document.getElementById('masterPass').value;
 
-            if (empName === "" || empSerial === "") {
-                alert("يرجى ملء كافة البيانات");
+            if (name === "" || id === "") {
+                alert("يرجى إكمال البيانات أولاً");
                 return;
             }
 
-            if (confirmPass === "787898") {
-                const uniqueToken = "SADEQ-" + empSerial + "-" + btoa(empName).substring(0, 8);
-                localStorage.setItem('sadeq_device_token', uniqueToken);
-                localStorage.setItem('employee_name', empName);
-                localStorage.setItem('employee_serial', empSerial);
-
-                alert("تم ربط الهاتف بنجاح بـ " + empName);
+            if (masterPass === "1122") {
+                // إنشاء وسم فريد للجهاز
+                const token = "SADEQ-" + id + "-" + btoa(unescape(encodeURIComponent(name))).substring(0, 10);
+                
+                localStorage.setItem('sadeq_token', token);
+                localStorage.setItem('sadeq_name', name);
+                
+                alert("تم بنجاح!\nالموظف: " + name + "\nالآن هذا الهاتف مرتبط بالنظام.");
                 document.getElementById('adminPanel').style.display = 'none';
-                location.reload();
+                location.reload(); // إعادة تحميل لإرسال البيانات للسكربت
             } else {
-                alert("رمز التفعيل خطأ!");
+                alert("رمز التأكيد خطأ");
             }
         }
     </script>
 </head>
 <body>
 
-    <div class="admin-trigger-btn" onclick="checkAdminAccess()">⚙️</div>
+    <div class="admin-gear" onclick="openAdmin()">⚙️</div>
 
     <div id="adminPanel">
-        <h2 style="color: #014dae; margin-bottom: 10px;">إعدادات الموظف</h2>
-        <input type="text" id="empNameInput" placeholder="اسم الموظف">
-        <input type="text" id="empSerialInput" placeholder="الرقم التسلسلي">
-        <input type="password" id="finalPass" placeholder="رمز تأكيد المدير">
+        <h3 style="color: #014dae; margin-top: 0;">تعريف موظف جديد</h3>
+        <p style="font-size: 13px; color: #aaa;">سيتم ربط هذا الهاتف بالموظف للأبد</p>
         
-        <button class="btn-action" onclick="saveDevice()">تثبيت الهوية على الجهاز</button>
-        <button class="btn-close" onclick="document.getElementById('adminPanel').style.display='none'">إلغاء</button>
+        <input type="text" id="nameInp" placeholder="اسم الموظف الثلاثي">
+        <input type="text" id="idInp" placeholder="رقم التسلسل (ID)">
+        <input type="password" id="masterPass" placeholder="رمز تأكيد المدير">
+        
+        <button class="btn-save" onclick="registerEmployee()">تثبيت الهوية الآن</button>
+        <button class="btn-cancel" onclick="document.getElementById('adminPanel').style.display='none'">إغاء</button>
     </div>
 
     <iframe 
@@ -117,12 +104,14 @@
     </iframe>
 
     <script>
+        // إرسال البيانات المخزنة للـ iframe عند التحميل
         window.onload = function() {
-            const token = localStorage.getItem('sadeq_device_token');
-            const name = localStorage.getItem('employee_name');
+            const token = localStorage.getItem('sadeq_token');
+            const name = localStorage.getItem('sadeq_name');
             if (token) {
                 const frame = document.getElementById('appFrame');
                 frame.onload = function() {
+                    // نرسل الهوية المخزنة للسكربت ليتعرف على الموظف تلقائياً
                     frame.contentWindow.postMessage({ 
                         'device_token': token,
                         'employee_name': name 
