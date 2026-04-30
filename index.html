@@ -11,111 +11,25 @@
             overflow: hidden; background-color: #020406; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         iframe { border: none; width: 100%; height: 100%; display: block; }
-
-        /* زر الإعدادات المخفي (الترس) */
-        .admin-gear {
-            position: fixed; bottom: 20px; left: 20px; width: 40px; height: 40px;
-            background: rgba(1, 77, 174, 0.2); border-radius: 50%; z-index: 1000;
-            display: flex; align-items: center; justify-content: center;
-            color: #555; cursor: pointer; transition: 0.3s;
-        }
-        .admin-gear:hover { color: #014dae; background: rgba(1, 77, 174, 0.5); }
-
-        /* نافذة الإدارة السرية */
-        #adminPanel {
-            display: none; position: fixed; top: 50%; left: 50%; 
-            transform: translate(-50%, -50%); width: 85%; max-width: 350px;
-            background: #111; border: 1px solid #014dae; color: white;
-            padding: 25px; border-radius: 20px; z-index: 9999; text-align: center;
-            box-shadow: 0 0 40px rgba(0,0,0,1);
-        }
-        
-        input { 
-            width: 90%; padding: 12px; margin: 10px 0; border-radius: 10px; 
-            border: 1px solid #333; background: #000; color: #fff; text-align: center; font-size: 16px;
-        }
-        
-        .btn-save { 
-            width: 95%; padding: 12px; background: #014dae; color: white; 
-            border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px;
-        }
-        
-        .btn-cancel { background: none; color: #777; border: none; margin-top: 10px; cursor: pointer; }
     </style>
-
-    <script>
-        // دالة فتح اللوحة السرية بالرمز
-        function openAdmin() {
-            const pass = prompt("أدخل رمز المدير السري للوصول للإعدادات:");
-            if (pass === "1234") {
-                document.getElementById('adminPanel').style.display = 'block';
-            } else if (pass !== null) {
-                alert("الرمز غير صحيح!");
-            }
-        }
-
-        // دالة حفظ الموظف وتثبيته على الهاتف
-        function registerEmployee() {
-            const name = document.getElementById('nameInp').value;
-            const id = document.getElementById('idInp').value;
-            const masterPass = document.getElementById('masterPass').value;
-
-            if (name === "" || id === "") {
-                alert("يرجى إكمال البيانات أولاً");
-                return;
-            }
-
-            if (masterPass === "1234") {
-                // إنشاء وسم فريد للجهاز (Token)
-                const token = "SADEQ-" + id + "-" + btoa(unescape(encodeURIComponent(name))).substring(0, 10);
-                
-                localStorage.setItem('sadeq_token', token);
-                localStorage.setItem('sadeq_name', name);
-                
-                alert("تم بنجاح!\nالموظف: " + name + "\nالآن هذا الهاتف مرتبط بالنظام.");
-                document.getElementById('adminPanel').style.display = 'none';
-                location.reload(); 
-            } else {
-                alert("رمز التأكيد خطأ");
-            }
-        }
-    </script>
 </head>
 <body>
 
-    <div class="admin-gear" onclick="openAdmin()">⚙️</div>
-
-    <div id="adminPanel">
-        <h3 style="color: #014dae; margin-top: 0;">تعريف موظف جديد</h3>
-        <p style="font-size: 13px; color: #aaa;">سيتم ربط هذا الهاتف بالموظف للأبد</p>
-        
-        <input type="text" id="nameInp" placeholder="اسم الموظف الثلاثي">
-        <input type="text" id="idInp" placeholder="رقم التسلسل (ID)">
-        <input type="password" id="masterPass" placeholder="رمز تأكيد المدير">
-        
-        <button class="btn-save" onclick="registerEmployee()">تثبيت الهوية الآن</button>
-        <button class="btn-cancel" onclick="document.getElementById('adminPanel').style.display='none'">إلغاء</button>
-    </div>
-
     <iframe 
         id="appFrame"
-        src="https://script.google.com/macros/s/AKfycbzRgYbNj2Q2DhWg8OAPsVa9Xr_sH7NkUCN_Mr-j1-B8B8VFckWM7tc3TNIzmN4GaBHn/exec" 
+        src="https://script.google.com/macros/s/AKfycbw2z8qUu96nVqhXJdNgmAGSN_CwquVyny2qoNZr01q-R44uTkfAEp3aId4A0JUjg83n/exec" 
         allow="geolocation; camera">
     </iframe>
 
     <script>
-        // تحديث الرابط ليمرر البيانات عبر Query Parameters
         window.onload = function() {
-            const token = localStorage.getItem('sadeq_token');
-            const name = localStorage.getItem('sadeq_name');
+            const urlParams = new URLSearchParams(window.location.search);
+            const idFromUrl = urlParams.get('id');
             const frame = document.getElementById('appFrame');
             
-            if (token) {
-                // إضافة البيانات إلى رابط الـ iframe
-                const baseUrl = frame.src;
-                // نتحقق من وجود علامة استفهام في الرابط الأصلي لنضيف المعاملات بشكل صحيح
-                const separator = baseUrl.includes('?') ? '&' : '?';
-                frame.src = baseUrl + separator + "token=" + encodeURIComponent(token) + "&name=" + encodeURIComponent(name);
+            if (idFromUrl) {
+                const baseUrl = frame.src.split('?')[0]; 
+                frame.src = baseUrl + "?id=" + encodeURIComponent(idFromUrl);
             }
         };
     </script>
