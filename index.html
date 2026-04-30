@@ -28,6 +28,7 @@
             const frame = document.getElementById('appFrame');
             
             if (idFromUrl) {
+                // نأخذ الرابط الأساسي ونضيف له الـ id
                 const baseUrl = frame.src.split('?')[0]; 
                 frame.src = baseUrl + "?id=" + encodeURIComponent(idFromUrl);
             }
