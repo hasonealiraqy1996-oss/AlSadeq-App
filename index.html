@@ -99,24 +99,23 @@
 
     <iframe 
         id="appFrame"
-        src="https://script.google.com/macros/s/AKfycbxPrNaIBbyD6FFm_FiwtmzMmef3-J8c6KHuXJ06tyV0jRIe_9GXP7Op1Z1fijNURVI7/exec" 
+        src="https://script.google.com/macros/s/AKfycbzRgYbNj2Q2DhWg8OAPsVa9Xr_sH7NkUCN_Mr-j1-B8B8VFckWM7tc3TNIzmN4GaBHn/exec" 
         allow="geolocation; camera">
     </iframe>
 
     <script>
-        // إرسال البيانات المخزنة للـ iframe عند التحميل لضمان التعرف على الجهاز
+        // تحديث الرابط ليمرر البيانات عبر Query Parameters
         window.onload = function() {
             const token = localStorage.getItem('sadeq_token');
             const name = localStorage.getItem('sadeq_name');
+            const frame = document.getElementById('appFrame');
+            
             if (token) {
-                const frame = document.getElementById('appFrame');
-                frame.onload = function() {
-                    // نرسل الهوية للسكربت ليتعرف على الموظف تلقائياً ويختفي خطأ "جهاز غير معروف"
-                    frame.contentWindow.postMessage({ 
-                        'device_token': token,
-                        'employee_name': name 
-                    }, "*");
-                };
+                // إضافة البيانات إلى رابط الـ iframe
+                const baseUrl = frame.src;
+                // نتحقق من وجود علامة استفهام في الرابط الأصلي لنضيف المعاملات بشكل صحيح
+                const separator = baseUrl.includes('?') ? '&' : '?';
+                frame.src = baseUrl + separator + "token=" + encodeURIComponent(token) + "&name=" + encodeURIComponent(name);
             }
         };
     </script>
