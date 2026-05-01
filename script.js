@@ -3,8 +3,17 @@ const COMPANY_LNG = 44.514822;
 const ALLOWED_RADIUS = 500;
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyvZlD5EgwDCqR_MhUkl5XwK-LzUG9WK9u8tD-rQbgelxrYYsCk1LMX4cHuVI0rbai6/exec";
 
+// تحسين منطق جلب الـ ID ليحفظه في ذاكرة الهاتف (localStorage)
 const urlParams = new URLSearchParams(window.location.search);
-const deviceId = urlParams.get('id') || "UNKNOWN";
+let deviceId = urlParams.get('id');
+
+if (deviceId) {
+    // إذا كان الـ ID موجوداً في الرابط، نحفظه في ذاكرة الهاتف
+    localStorage.setItem('app_device_id', deviceId);
+} else {
+    // إذا لم يكن في الرابط، نحاول استرجاعه من ذاكرة الهاتف، وإلا يكون UNKNOWN
+    deviceId = localStorage.getItem('app_device_id') || "UNKNOWN";
+}
 
 function updateClock() {
     const dEl = document.getElementById('cur-date');
