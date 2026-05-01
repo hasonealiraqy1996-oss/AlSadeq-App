@@ -10,7 +10,8 @@
   body, html {
     margin: 0; padding: 0; width: 100%; height: 100vh;
     display: flex; justify-content: center; align-items: center;
-    background: var(--bg-dark); overflow: hidden;
+    background: var(--bg-dark) !important; /* تم إضافة !important هنا */
+    overflow: hidden;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     direction: rtl;
   }
