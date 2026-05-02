@@ -1,5 +1,10 @@
 const COMPANY_LAT = 33.365854; 
 const COMPANY_LNG = 44.413227; 
+
+// إحداثيات الفرع الثاني (قم بتعديل هذه القيم)
+const COMPANY_LAT_2 = 33.367991; 
+const COMPANY_LNG_2 = 44.406106; 
+
 const ALLOWED_RADIUS = 500;
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyvZlD5EgwDCqR_MhUkl5XwK-LzUG9WK9u8tD-rQbgelxrYYsCk1LMX4cHuVI0rbai6/exec";
 
@@ -8,10 +13,8 @@ const urlParams = new URLSearchParams(window.location.search);
 let deviceId = urlParams.get('id');
 
 if (deviceId) {
-    // إذا كان الـ ID موجوداً في الرابط، نحفظه في ذاكرة الهاتف
     localStorage.setItem('app_device_id', deviceId);
 } else {
-    // إذا لم يكن في الرابط، نحاول استرجاعه من ذاكرة الهاتف، وإلا يكون UNKNOWN
     deviceId = localStorage.getItem('app_device_id') || "UNKNOWN";
 }
 
@@ -59,9 +62,20 @@ function checkLocationAndEnter() {
     Swal.fire({ title: 'جاري فحص النطاق الأمني', html: 'يتم التحقق من موقعك...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((pos) => {
-            const d = calculateDistance(pos.coords.latitude, pos.coords.longitude, COMPANY_LAT, COMPANY_LNG);
-            if (d <= ALLOWED_RADIUS) { Swal.close(); startSystem(); }
-            else { Swal.fire({ icon: 'error', title: 'دخول مرفوض', text: `بعيد عن الشركة بمقدار ${(d/1000).toFixed(2)} كم.` }); }
+            // حساب المسافة للموقع الأول
+            const d1 = calculateDistance(pos.coords.latitude, pos.coords.longitude, COMPANY_LAT, COMPANY_LNG);
+            // حساب المسافة للموقع الثاني
+            const d2 = calculateDistance(pos.coords.latitude, pos.coords.longitude, COMPANY_LAT_2, COMPANY_LNG_2);
+            
+            // التحقق: إذا كان الموظف ضمن نطاق الموقع الأول OR نطاق الموقع الثاني
+            if (d1 <= ALLOWED_RADIUS || d2 <= ALLOWED_RADIUS) { 
+                Swal.close(); 
+                startSystem(); 
+            } else { 
+                // إظهار المسافة لأقرب فرع لتسهيل معرفة الخطأ
+                const minDistance = Math.min(d1, d2);
+                Swal.fire({ icon: 'error', title: 'دخول مرفوض', text: `بعيد عن كلا الفرعين. المسافة لأقرب فرع: ${(minDistance/1000).toFixed(2)} كم.` }); 
+            }
         }, () => Swal.fire({ icon: 'warning', title: 'خدمة الموقع معطلة', text: 'يرجى تفعيل الـ GPS.' }));
     }
 }
