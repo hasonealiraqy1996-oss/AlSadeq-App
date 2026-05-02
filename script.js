@@ -1,5 +1,5 @@
-const COMPANY_LAT = 33.306140; 
-const COMPANY_LNG = 44.514822; 
+const COMPANY_LAT = 33.365854; 
+const COMPANY_LNG = 44.413227; 
 const ALLOWED_RADIUS = 500;
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyvZlD5EgwDCqR_MhUkl5XwK-LzUG9WK9u8tD-rQbgelxrYYsCk1LMX4cHuVI0rbai6/exec";
 
