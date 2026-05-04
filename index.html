@@ -1,109 +1,106 @@
-/**
- * نظام شركة الصادق - كود الخادم (Backend)
- */
+**
+ * نظام شركة الصادق - كود الخادم (Backend)
+ */
 
 function doGet(e) {
-  var params = (e && e.parameter) ? e.parameter : {};
+  var params = (e && e.parameter) ? e.parameter : {};
 
-  // --- استقبال طلبات الـ API ---
-  if (params.action === 'record') {
-    var name = params.name;
-    if (!name && params.id) {
-       var status = checkDeviceStatus(params.id);
-       name = status.registered ? status.name : "غير معروف";
-    }
+  // --- التعديل: استقبال طلبات الـ API ---
+  if (params.action === 'record') {
+    // إذا لم يصل الاسم، نجلب الاسم من الجدول باستخدام الـ id
+    var name = params.name;
+    if (!name && params.id) {
+       var status = checkDeviceStatus(params.id);
+       name = status.registered ? status.name : "غير معروف";
+    }
 
-    var result = recordAction({
-      name: name, 
-      status: params.type, 
-      deviceId: params.id
-    });
-    return ContentService.createTextOutput(result);
-  } else if (params.id && !params.action) {
-    // استقبال طلب التحقق من حالة الجهاز
-    var status = checkDeviceStatus(params.id);
-    return ContentService.createTextOutput(JSON.stringify(status))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
+    var result = recordAction({
+      name: name, 
+      status: params.type, 
+      deviceId: params.id
+    });
+    return ContentService.createTextOutput(result);
+  } else if (params.id && !params.action) {
+    // استقبال طلب التحقق من حالة الجهاز
+    var status = checkDeviceStatus(params.id);
+    return ContentService.createTextOutput(JSON.stringify(status))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 
-  // --- الجزء الخاص بالواجهة ---
-  var template = HtmlService.createTemplateFromFile('Interface');
-  
-  var id = params.id || ""; 
-  var status = checkDeviceStatus(id);
-  
-  template.userId = id;
-  template.userName = status.registered ? status.name : ""; 
+  // --- الجزء الخاص بالواجهة ---
+  var template = HtmlService.createTemplateFromFile('Interface');
+  
+  // تمرير المتغيرات للواجهة بناءً على الـ id فقط
+  var id = params.id || ""; 
+  var status = checkDeviceStatus(id);
+  
+  template.userId = id;
+  template.userName = status.registered ? status.name : ""; 
 
-  return template.evaluate()
-      .setTitle('شركة الصادق | نظام الحضور')
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  return template.evaluate()
+      .setTitle('شركة الصادق | نظام الحضور')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 function include(filename) {
-  return HtmlService.createTemplateFromFile(filename).evaluate().getContent();
+  return HtmlService.createTemplateFromFile(filename).evaluate().getContent();
 }
 
 function checkDeviceStatus(deviceId) {
-  try {
-    var ss = SpreadsheetApp.openById("1qXYDpWwL_a6Sx58z394KybLnHA7hvq7r7qg7pcSPFaE");
-    var sheet = ss.getSheetByName("Main");
-    var data = sheet.getRange("M2:N" + sheet.getLastRow()).getValues();
-    
-    for (var i = 0; i < data.length; i++) {
-      if (data[i][1] && data[i][1].toString().trim() === deviceId.toString().trim()) {
-        return { registered: true, name: data[i][0].toString().trim() }; 
-      }
-    }
-    return { registered: false }; 
-  } catch(e) { return { registered: false }; }
+  try {
+    var ss = SpreadsheetApp.openById("1qXYDpWwL_a6Sx58z394KybLnHA7hvq7r7qg7pcSPFaE");
+    var sheet = ss.getSheetByName("Main");
+    var data = sheet.getRange("M2:N" + sheet.getLastRow()).getValues();
+    
+    for (var i = 0; i < data.length; i++) {
+      if (data[i][1] && data[i][1].toString().trim() === deviceId.toString().trim()) {
+        return { registered: true, name: data[i][0].toString().trim() }; 
+      }
+    }
+    return { registered: false }; 
+  } catch(e) { return { registered: false }; }
 }
 
 function recordAction(data) {
-  try {
-    var ss = SpreadsheetApp.openById("1qXYDpWwL_a6Sx58z394KybLnHA7hvq7r7qg7pcSPFaE");
-    var sheet = ss.getSheetByName("Main");
-    var now = new Date();
-    var dateStr = Utilities.formatDate(now, "GMT+3", "yyyy-MM-dd");
-    var timeStr = Utilities.formatDate(now, "GMT+3", "HH:mm:ss");
-    var colA = sheet.getRange("A:A").getValues();
-    var colC = sheet.getRange("C:C").getValues();
-    var colD = sheet.getRange("D:D").getValues();
-    
-    var foundRow = -1;
-    var firstEmptyRow = -1;
-    var alreadyPresent = false;
+  try {
+    var ss = SpreadsheetApp.openById("1qXYDpWwL_a6Sx58z394KybLnHA7hvq7r7qg7pcSPFaE");
+    var sheet = ss.getSheetByName("Main");
+    var now = new Date();
+    var dateStr = Utilities.formatDate(now, "GMT+3", "yyyy-MM-dd");
+    var timeStr = Utilities.formatDate(now, "GMT+3", "HH:mm:ss");
+    var colA = sheet.getRange("A:A").getValues();
+    var colC = sheet.getRange("C:C").getValues();
+    var colD = sheet.getRange("D:D").getValues();
+    
+    var foundRow = -1;
+    var firstEmptyRow = -1;
+    var alreadyPresent = false;
 
-    for (var i = 1; i < colA.length; i++) {
-      if (firstEmptyRow === -1 && colA[i][0] === "") firstEmptyRow = i + 1;
-      var rowDate = colC[i][0] instanceof Date ? Utilities.formatDate(colC[i][0], "GMT+3", "yyyy-MM-dd") : colC[i][0];
-      if (colA[i][0] && colA[i][0].toString().trim() === data.name.trim() && rowDate === dateStr) {
-        foundRow = i + 1;
-        if (colD[i][0] !== "") alreadyPresent = true;
-      }
-    }
+    for (var i = 1; i < colA.length; i++) {
+      if (firstEmptyRow === -1 && colA[i][0] === "") firstEmptyRow = i + 1;
+      var rowDate = colC[i][0] instanceof Date ? Utilities.formatDate(colC[i][0], "GMT+3", "yyyy-MM-dd") : colC[i][0];
+      if (colA[i][0] && colA[i][0].toString().trim() === data.name.trim() && rowDate === dateStr) {
+        foundRow = i + 1;
+        if (colD[i][0] !== "") alreadyPresent = true;
+      }
+    }
 
-    if (data.status === "IN") {
-      if (alreadyPresent) return "⚠️ يا " + data.name + "، سجلت حضورك مسبقاً!";
-      var targetRow = (firstEmptyRow !== -1) ? firstEmptyRow : sheet.getLastRow() + 1;
-      sheet.getRange(targetRow, 1).setValue(data.name);
-      sheet.getRange(targetRow, 2).setValue("حاضر");
-      sheet.getRange(targetRow, 3).setValue(dateStr);
-      sheet.getRange(targetRow, 4).setValue(timeStr);
-      
-      // السطر موجود ولكن الشرط (false) يمنع تنفيذه:
-      if (false) {
-        sheet.getRange(targetRow, 11).setValue(data.deviceId);
-      }
-      
-      return "✅ تم تسجيل الحضور: " + data.name;
-    } else {
-      if (foundRow !== -1) {
-        sheet.getRange(foundRow, 5).setValue(timeStr);
-        return "✅ تم تسجيل انصرافك.. مع السلامة";
-      }
-      return "⚠️ لم تسجل حضورك بعد اليوم!";
-    }
-  } catch(e) { return "❌ خطأ في الاتصال بالسيرفر"; }
+    if (data.status === "IN") {
+      if (alreadyPresent) return "⚠️ يا " + data.name + "، سجلت حضورك مسبقاً!";
+      var targetRow = (firstEmptyRow !== -1) ? firstEmptyRow : sheet.getLastRow() + 1;
+      sheet.getRange(targetRow, 1).setValue(data.name);
+      sheet.getRange(targetRow, 2).setValue("حاضر");
+      sheet.getRange(targetRow, 3).setValue(dateStr);
+      sheet.getRange(targetRow, 4).setValue(timeStr);
+      sheet.getRange(targetRow, 11).setValue(data.deviceId);
+      return "✅ تم تسجيل الحضور: " + data.name;
+    } else {
+      if (foundRow !== -1) {
+        sheet.getRange(foundRow, 5).setValue(timeStr);
+        return "✅ تم تسجيل انصرافك.. مع السلامة";
+      }
+      return "⚠️ لم تسجل حضورك بعد اليوم!";
+    }
+  } catch(e) { return "❌ خطأ في الاتصال بالسيرفر"; }
 }
