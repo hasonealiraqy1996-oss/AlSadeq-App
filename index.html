@@ -1,56 +1,107 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="شركة الصادق">
-    
-    <title>شركة الصادق | النظام الآمن</title>
-    
-    <link rel="apple-touch-icon" href="logo.png">
-    <link rel="icon" href="logo.png">
-    <link rel="manifest" href="manifest.json">
-    
-    <link rel="stylesheet" href="style.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body>
+/**
+ * نظام شركة الصادق - كود الخادم (Backend)
+ */
 
-    <div class="bg-glow"></div>
+function doGet(e) {
+  var params = (e && e.parameter) ? e.parameter : {};
 
-    <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; transition: 1s cubic-bezier(0.77, 0, 0.175, 1);">
-        <div style="text-align: center;">
-            <h1 style="font-size: 55px; font-weight: 900; margin: 0; background: linear-gradient(to bottom, #007bff, #0056b3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px;">شركة الصادق</h1>
-            <p style="color: #007bff; letter-spacing: 5px; font-size: 12px; font-weight: 300; margin-top: 10px; opacity: 0.8;">PREMIUM MANAGEMENT SYSTEM</p>
-            <div style="margin-top: 50px; position: relative; cursor: pointer;" onclick="checkLocationAndEnter()">
-                <button style="position: relative; background: #007bff; border: none; color: white; padding: 18px 60px; border-radius: 50px; font-size: 16px; cursor: pointer; box-shadow: 0 10px 20px rgba(0,123,255,0.3);">دخول النظام الآمن</button>
-            </div>
-            <p style="font-size: 10px; color: rgba(0,0,0,0.4); margin-top: 25px; letter-spacing: 1px;">يتم التحقق من الموقع الجغرافي تلقائياً</p>
-        </div>
-    </div>
+  // --- استقبال طلبات الـ API ---
+  if (params.action === 'record') {
+    var name = params.name;
+    if (!name && params.id) {
+       var status = checkDeviceStatus(params.id);
+       name = status.registered ? status.name : "غير معروف";
+    }
 
-    <div id="main-content" style="display: none; opacity: 0; transition: 1.5s; width: 100%; justify-content: center; align-items: center; min-height: 100vh;">
-        <div class="glass-card">
-            <div style="font-size: 11px; color: #007bff; font-weight: bold; letter-spacing: 3px; text-transform: uppercase;">AL-SADEQ PREMIUM</div>
-            <h2 style="color: #333; font-size: 26px; margin: 15px 0;">نظام الحضور والإنصراف</h2>
-            <div class="user-badge">
-                <div id="emp-name" style="font-size: 28px; font-weight: bold; color: #333;">جاري التعرف...</div>
-                <div id="p-id" style="color: #666;">---</div>
-            </div>
-            <div style="margin-bottom: 40px;">
-                <div class="time-text" id="cur-time" style="color: #333;">00:00:00</div>
-                <div id="cur-date" style="font-size: 14px; color: rgba(0,0,0,0.5); margin-top: 8px;">---</div>
-            </div>
-            <button id="btnIn" class="btn-modern btn-in">تسجيل حضور</button>
-            <button id="btnOut" class="btn-modern btn-out">تسجيل انصراف</button>
-            <div id="msg" style="margin-top: 20px; font-size: 14px; color: #007bff; font-weight: 500;"></div>
-        </div>
-    </div>
+    var result = recordAction({
+      name: name, 
+      status: params.type, 
+      deviceId: params.id
+    });
+    return ContentService.createTextOutput(result);
+  } else if (params.id && !params.action) {
+    // استقبال طلب التحقق من حالة الجهاز
+    var status = checkDeviceStatus(params.id);
+    return ContentService.createTextOutput(JSON.stringify(status))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 
-    <script src="script.js"></script>
-</body>
-</html>
+  // --- الجزء الخاص بالواجهة ---
+  var template = HtmlService.createTemplateFromFile('Interface');
+  
+  var id = params.id || ""; 
+  var status = checkDeviceStatus(id);
+  
+  template.userId = id;
+  template.userName = status.registered ? status.name : ""; 
+
+  return template.evaluate()
+      .setTitle('شركة الصادق | نظام الحضور')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function include(filename) {
+  return HtmlService.createTemplateFromFile(filename).evaluate().getContent();
+}
+
+function checkDeviceStatus(deviceId) {
+  try {
+    var ss = SpreadsheetApp.openById("1qXYDpWwL_a6Sx58z394KybLnHA7hvq7r7qg7pcSPFaE");
+    var sheet = ss.getSheetByName("Main");
+    var data = sheet.getRange("M2:N" + sheet.getLastRow()).getValues();
+    
+    for (var i = 0; i < data.length; i++) {
+      if (data[i][1] && data[i][1].toString().trim() === deviceId.toString().trim()) {
+        return { registered: true, name: data[i][0].toString().trim() }; 
+      }
+    }
+    return { registered: false }; 
+  } catch(e) { return { registered: false }; }
+}
+
+function recordAction(data) {
+  try {
+    var ss = SpreadsheetApp.openById("1qXYDpWwL_a6Sx58z394KybLnHA7hvq7r7qg7pcSPFaE");
+    var sheet = ss.getSheetByName("Main");
+    var now = new Date();
+    var dateStr = Utilities.formatDate(now, "GMT+3", "yyyy-MM-dd");
+    var timeStr = Utilities.formatDate(now, "GMT+3", "HH:mm:ss");
+    var colA = sheet.getRange("A:A").getValues();
+    var colC = sheet.getRange("C:C").getValues();
+    var colD = sheet.getRange("D:D").getValues();
+    
+    var foundRow = -1;
+    var firstEmptyRow = -1;
+    var alreadyPresent = false;
+
+    for (var i = 1; i < colA.length; i++) {
+      if (firstEmptyRow === -1 && colA[i][0] === "") firstEmptyRow = i + 1;
+      var rowDate = colC[i][0] instanceof Date ? Utilities.formatDate(colC[i][0], "GMT+3", "yyyy-MM-dd") : colC[i][0];
+      if (colA[i][0] && colA[i][0].toString().trim() === data.name.trim() && rowDate === dateStr) {
+        foundRow = i + 1;
+        if (colD[i][0] !== "") alreadyPresent = true;
+      }
+    }
+
+    if (data.status === "IN") {
+      if (alreadyPresent) return "⚠️ يا " + data.name + "، سجلت حضورك مسبقاً!";
+      var targetRow = (firstEmptyRow !== -1) ? firstEmptyRow : sheet.getLastRow() + 1;
+      sheet.getRange(targetRow, 1).setValue(data.name);
+      sheet.getRange(targetRow, 2).setValue("حاضر");
+      sheet.getRange(targetRow, 3).setValue(dateStr);
+      sheet.getRange(targetRow, 4).setValue(timeStr);
+      
+      // تم إيقاف الكتابة في العمود K كما طلبت:
+      // sheet.getRange(targetRow, 11).setValue(data.deviceId);
+      
+      return "✅ تم تسجيل الحضور: " + data.name;
+    } else {
+      if (foundRow !== -1) {
+        sheet.getRange(foundRow, 5).setValue(timeStr);
+        return "✅ تم تسجيل انصرافك.. مع السلامة";
+      }
+      return "⚠️ لم تسجل حضورك بعد اليوم!";
+    }
+  } catch(e) { return "❌ خطأ في الاتصال بالسيرفر"; }
+}
