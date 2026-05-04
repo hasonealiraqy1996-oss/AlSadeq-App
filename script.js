@@ -6,7 +6,7 @@ const COMPANY_LAT_2 = 33.367991;
 const COMPANY_LNG_2 = 44.406106; 
 
 const ALLOWED_RADIUS = 500;
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyvZlD5EgwDCqR_MhUkl5XwK-LzUG9WK9u8tD-rQbgelxrYYsCk1LMX4cHuVI0rbai6/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyx2ug2B20YiNHyguhMaQWg4vWrt5cL4EtOf-aC0VIsbXFGaYWLYRmNm7GcfiuDJ_Bj/exec";
 
 // تحسين منطق جلب الـ ID ليحفظه في ذاكرة الهاتف (localStorage)
 const urlParams = new URLSearchParams(window.location.search);
