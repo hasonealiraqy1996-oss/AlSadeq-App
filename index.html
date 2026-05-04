@@ -1,6 +1,5 @@
 /**
- * نظام شركة الصادق - كود الخادم (Backend.gs)
- * الإصدار المحدث: لا يتم الكتابة في العمود K
+ * نظام شركة الصادق - كود الخادم (Backend)
  */
 
 function doGet(e) {
@@ -93,8 +92,10 @@ function recordAction(data) {
       sheet.getRange(targetRow, 3).setValue(dateStr);
       sheet.getRange(targetRow, 4).setValue(timeStr);
       
-      // تم تعليق السطر أدناه لمنع الكتابة في العمود K
-      // sheet.getRange(targetRow, 11).setValue(data.deviceId);
+      // السطر موجود ولكن الشرط (false) يمنع تنفيذه:
+      if (false) {
+        sheet.getRange(targetRow, 11).setValue(data.deviceId);
+      }
       
       return "✅ تم تسجيل الحضور: " + data.name;
     } else {
